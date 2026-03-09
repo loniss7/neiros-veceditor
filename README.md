@@ -13,6 +13,7 @@
 - стилизованный вывод на `rich`
 - архитектура с разделением на `domain / services / repositories / cli`
 - unit-тесты на `pytest` для domain, repository, service и CLI слоёв
+- хранение фигур в локальной SQLite-базе между запусками приложения
 
 ## Support
 

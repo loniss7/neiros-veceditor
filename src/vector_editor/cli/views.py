@@ -13,6 +13,9 @@ class RichCLIView:
     def __init__(self) -> None:
         self.console = Console()
 
+    def clear(self) -> None:
+        self.console.clear()
+
     def render_header(self) -> None:
         self.console.print(
             Panel.fit(

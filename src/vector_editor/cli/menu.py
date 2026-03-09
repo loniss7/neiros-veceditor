@@ -51,6 +51,9 @@ class QuestionaryMenu:
         ).ask()
         return int(answer) if answer is not None else None
 
+    def pause(self) -> None:
+        questionary.text("Press Enter to continue").ask()
+
     @staticmethod
     def _validate_float(text: str) -> bool | str:
         try:

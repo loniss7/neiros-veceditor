@@ -1,7 +1,5 @@
 from vector_editor.cli.controller import CLIController
 from vector_editor.cli.menu import MenuAction
-from vector_editor.domain.errors import ShapeNotFoundError, ValidationError
-from vector_editor.domain.shapes import Point
 
 
 class DummyMenu:
@@ -28,12 +26,16 @@ class DummyMenu:
 
 class DummyView:
     def __init__(self):
+        self.clear_calls = 0
         self.header_calls = 0
         self.help_calls = 0
         self.rendered_shapes = None
         self.success_messages = []
         self.info_messages = []
         self.error_messages = []
+
+    def clear(self):
+        self.clear_calls += 1
 
     def render_header(self):
         self.header_calls += 1
@@ -54,7 +56,8 @@ class DummyView:
         self.error_messages.append(message)
 
 
-def test_list_shapes(service):
+def test_list_shapes(service, monkeypatch):
+    monkeypatch.setattr("builtins.input", lambda *args, **kwargs: "")
     service.create_point(1, 2)
     menu = DummyMenu([MenuAction.LIST_SHAPES, MenuAction.EXIT])
     view = DummyView()
@@ -62,7 +65,8 @@ def test_list_shapes(service):
     controller = CLIController(service, view, menu)
     controller.run()
 
-    assert view.header_calls == 1
+    assert view.clear_calls >= 1
+    assert view.header_calls >= 1
     assert view.help_calls == 1
     assert len(view.rendered_shapes) == 1
     assert view.info_messages[-1] == "Goodbye."
@@ -75,12 +79,14 @@ def test_exit(service):
     controller = CLIController(service, view, menu)
     controller.run()
 
+    assert view.clear_calls == 1
     assert view.header_calls == 1
     assert view.help_calls == 1
     assert view.info_messages == ["Goodbye."]
 
 
-def test_create_point(service):
+def test_create_point(service, monkeypatch):
+    monkeypatch.setattr("builtins.input", lambda *args, **kwargs: "")
     menu = DummyMenu([MenuAction.CREATE_POINT, MenuAction.EXIT], float_values=[10, 20])
     view = DummyView()
 
@@ -92,7 +98,8 @@ def test_create_point(service):
     assert "Created Point #1: x=10, y=20" in view.success_messages[0]
 
 
-def test_create_circle(service):
+def test_create_circle(service, monkeypatch):
+    monkeypatch.setattr("builtins.input", lambda *args, **kwargs: "")
     menu = DummyMenu(
         [MenuAction.CREATE_CIRCLE, MenuAction.EXIT],
         float_values=[5, 6, 7],
@@ -106,7 +113,8 @@ def test_create_circle(service):
     assert "Created Circle #1: center=(5, 6), radius=7" in view.success_messages[0]
 
 
-def test_delete_shape(service):
+def test_delete_shape(service, monkeypatch):
+    monkeypatch.setattr("builtins.input", lambda *args, **kwargs: "")
     shape = service.create_point(1, 2)
     menu = DummyMenu([MenuAction.DELETE_SHAPE, MenuAction.EXIT], shape_id=shape.id)
     view = DummyView()
@@ -119,7 +127,8 @@ def test_delete_shape(service):
     assert view.success_messages[0] == f"Deleted Point #{shape.id}."
 
 
-def test_delete_shape_when_empty(service):
+def test_delete_shape_when_empty(service, monkeypatch):
+    monkeypatch.setattr("builtins.input", lambda *args, **kwargs: "")
     menu = DummyMenu([MenuAction.DELETE_SHAPE, MenuAction.EXIT])
     view = DummyView()
 
@@ -130,7 +139,8 @@ def test_delete_shape_when_empty(service):
     assert view.info_messages[-1] == "Goodbye."
 
 
-def test_delete_shape_cancelled(service):
+def test_delete_shape_cancelled(service, monkeypatch):
+    monkeypatch.setattr("builtins.input", lambda *args, **kwargs: "")
     service.create_point(1, 2)
     menu = DummyMenu([MenuAction.DELETE_SHAPE, MenuAction.EXIT], shape_id=None)
     view = DummyView()
@@ -142,7 +152,8 @@ def test_delete_shape_cancelled(service):
     assert len(service.list_shapes()) == 1
 
 
-def test_help_action(service):
+def test_help_action(service, monkeypatch):
+    monkeypatch.setattr("builtins.input", lambda *args, **kwargs: "")
     menu = DummyMenu([MenuAction.HELP, MenuAction.EXIT])
     view = DummyView()
 
@@ -152,13 +163,13 @@ def test_help_action(service):
     assert view.help_calls == 2
 
 
-def test_keyboard_interrupt_is_handled(service):
+def test_keyboard_interrupt_is_handled(service, monkeypatch):
+    monkeypatch.setattr("builtins.input", lambda *args, **kwargs: "")
     menu = DummyMenu([], raises=KeyboardInterrupt())
     view = DummyView()
 
     controller = CLIController(service, view, menu)
 
-    # Break loop after one handled exception and one exit
     def choose_action_sequence():
         if not hasattr(menu, "_called"):
             menu._called = True
@@ -173,7 +184,8 @@ def test_keyboard_interrupt_is_handled(service):
     assert view.info_messages[-1] == "Goodbye."
 
 
-def test_validation_error_is_handled(service):
+def test_validation_error_is_handled(service, monkeypatch):
+    monkeypatch.setattr("builtins.input", lambda *args, **kwargs: "")
     menu = DummyMenu([MenuAction.CREATE_CIRCLE, MenuAction.EXIT], float_values=[0, 0, 0])
     view = DummyView()
 
@@ -184,7 +196,8 @@ def test_validation_error_is_handled(service):
     assert view.info_messages[-1] == "Goodbye."
 
 
-def test_shape_not_found_error_is_handled(service):
+def test_shape_not_found_error_is_handled(service, monkeypatch):
+    monkeypatch.setattr("builtins.input", lambda *args, **kwargs: "")
     menu = DummyMenu([MenuAction.DELETE_SHAPE, MenuAction.EXIT], shape_id=999)
     view = DummyView()
 

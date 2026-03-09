@@ -3,11 +3,11 @@ from __future__ import annotations
 from vector_editor.domain.base import Shape
 from vector_editor.domain.errors import ShapeNotFoundError, ValidationError
 from vector_editor.domain.shapes import Circle, Point, Segment, Square
-from vector_editor.repositories.memory import InMemoryShapeRepository
+from vector_editor.repositories.base import ShapeRepository
 
 
 class ShapeService:
-    def __init__(self, repository: InMemoryShapeRepository) -> None:
+    def __init__(self, repository: ShapeRepository) -> None:
         self._repository = repository
 
     def create_point(self, x: float, y: float) -> Shape:

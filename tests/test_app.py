@@ -9,18 +9,24 @@ class DummyController:
         self.ran = True
 
 
-def test_main_runs_controller(monkeypatch):
+def test_build_application_returns_controller(monkeypatch):
     controller = DummyController()
 
-    monkeypatch.setattr(app, "InMemoryShapeRepository", lambda: object())
+    monkeypatch.setattr(app, "SQLiteShapeRepository", lambda: object())
     monkeypatch.setattr(app, "ShapeService", lambda repository: object())
     monkeypatch.setattr(app, "RichCLIView", lambda: object())
     monkeypatch.setattr(app, "QuestionaryMenu", lambda: object())
+    monkeypatch.setattr(app, "CLIController", lambda service, view, menu: controller)
 
-    def fake_controller(service, view, menu):
-        return controller
+    result = app.build_application()
 
-    monkeypatch.setattr(app, "CLIController", fake_controller)
+    assert result is controller
+
+
+def test_main_runs_controller(monkeypatch):
+    controller = DummyController()
+
+    monkeypatch.setattr(app, "build_application", lambda: controller)
 
     app.main()
 

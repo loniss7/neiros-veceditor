@@ -3,12 +3,12 @@ from __future__ import annotations
 from vector_editor.cli.controller import CLIController
 from vector_editor.cli.menu import QuestionaryMenu
 from vector_editor.cli.views import RichCLIView
-from vector_editor.repositories.memory import InMemoryShapeRepository
+from vector_editor.repositories.sqlite import SQLiteShapeRepository
 from vector_editor.services.shape_service import ShapeService
 
 
 def build_application() -> CLIController:
-    repository = InMemoryShapeRepository() # during the current session
+    repository = SQLiteShapeRepository()  # persistent storage in SQLite
     service = ShapeService(repository=repository)
     view = RichCLIView()
     menu = QuestionaryMenu()

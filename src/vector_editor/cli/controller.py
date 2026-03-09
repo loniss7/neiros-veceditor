@@ -13,6 +13,7 @@ class CLIController:
         self._menu = menu
 
     def run(self) -> None:
+        self._view.clear()
         self._view.render_header()
         self._view.render_help()
 
@@ -22,13 +23,19 @@ class CLIController:
                 if action is MenuAction.EXIT:
                     self._view.info("Goodbye.")
                     return
+
                 self._dispatch(action)
+
             except KeyboardInterrupt:
                 self._view.info("Operation cancelled by user.")
             except (ValidationError, ShapeNotFoundError) as exc:
                 self._view.error(str(exc))
             except VectorEditorError as exc:
                 self._view.error(str(exc))
+
+            input("\nPress Enter to continue...")
+            self._view.clear()
+            self._view.render_header()
 
     def _dispatch(self, action: MenuAction) -> None:
         if action is MenuAction.CREATE_POINT:
