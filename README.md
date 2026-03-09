@@ -12,6 +12,7 @@
 - menu-driven CLI на `questionary`
 - стилизованный вывод на `rich`
 - архитектура с разделением на `domain / services / repositories / cli`
+- unit-тесты на `pytest` для domain, repository, service и CLI слоёв
 
 ## Support
 
