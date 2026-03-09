@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vector-editor-cli"
+version = "0.1.0"
+description = "CLI vector editor"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "loniss7" }]
+
+dependencies = [
+  "questionary>=2.1.0",
+  "rich>=13.9.0"
+]
+
+[project.scripts]
+vector-editor = "vector_editor.app:main"
+
+[project.optional-dependencies]
+dev = [
+  "ruff>=0.8.0"
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "N"]

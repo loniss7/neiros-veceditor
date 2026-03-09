@@ -1,0 +1,30 @@
+Metadata-Version: 2.4
+Name: vector-editor-cli
+Version: 0.1.0
+Summary: CLI vector editor
+Author: loniss7
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: questionary>=2.1.0
+Requires-Dist: rich>=13.9.0
+Provides-Extra: dev
+Requires-Dist: ruff>=0.8.0; extra == "dev"
+
+# Vector Editor CLI
+
+Тестовое задание Neiros: векторный редактор с интерфейсом командной строки.
+
+## Что реализовано
+
+- создание фигур: `Point`, `Segment`, `Circle`, `Square`
+- сохранение во временной памяти текущей сессии
+- удаление фигур по `id`
+- просмотр списка фигур
+- валидация входных данных
+- menu-driven CLI на `questionary`
+- стилизованный вывод на `rich`
+- архитектура с разделением на `domain / services / repositories / cli`
+
+## Support
+
+- Python 3.13
