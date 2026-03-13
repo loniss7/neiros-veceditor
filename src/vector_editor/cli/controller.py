@@ -33,7 +33,7 @@ class CLIController:
             except VectorEditorError as exc:
                 self._view.error(str(exc))
 
-            input("\nPress Enter to continue...")
+            self._menu.pause()
             self._view.clear()
             self._view.render_header()
 
@@ -58,6 +58,12 @@ class CLIController:
             return
         if action is MenuAction.HELP:
             self._view.render_help()
+            return
+        if action is MenuAction.CREATE_OVAL:
+            self._create_oval()
+            return
+        if action is MenuAction.CREATE_RECTANGLE:
+            self._create_rectangle()
             return
 
     def _create_point(self) -> None:
@@ -86,6 +92,22 @@ class CLIController:
         y = self._menu.ask_float("origin y")
         side = self._menu.ask_float("side")
         shape = self._service.create_square(x=x, y=y, side=side)
+        self._view.success(f"Created {shape.shape_type} #{shape.id}: {shape.summary()}")
+
+    def _create_oval(self) -> None:
+        center_x = self._menu.ask_float("center x")
+        center_y = self._menu.ask_float("center y")
+        radius_x = self._menu.ask_float("radius x")
+        radius_y = self._menu.ask_float("radius y")
+        shape = self._service.create_oval(center_x=center_x, center_y=center_y, radius_x=radius_x, radius_y=radius_y)
+        self._view.success(f"Created {shape.shape_type} #{shape.id}: {shape.summary()}")
+
+    def _create_rectangle(self) -> None:
+        x = self._menu.ask_float("origin x")
+        y = self._menu.ask_float("origin y")
+        width = self._menu.ask_float("width")
+        height = self._menu.ask_float("height")
+        shape = self._service.create_rectangle(x=x, y=y, width=width, height=height)
         self._view.success(f"Created {shape.shape_type} #{shape.id}: {shape.summary()}")
 
     def _delete_shape(self) -> None:

@@ -1,7 +1,7 @@
 import pytest
 
 from vector_editor.domain.errors import ShapeNotFoundError, ValidationError
-from vector_editor.domain.shapes import Circle, Point, Square
+from vector_editor.domain.shapes import Circle, Oval, Point, Rectangle, Square
 
 
 def test_create_point(service):
@@ -36,6 +36,56 @@ def test_create_square_invalid_side(service):
         service.create_square(0, 0, -1)
 
 
+def test_create_square(service):
+    shape = service.create_square(0, 0, 3)
+
+    assert isinstance(shape, Square)
+    assert shape.id == 1
+    assert shape.summary() == "origin=(0, 0), side=3"
+
+
+def test_create_oval(service):
+    shape = service.create_oval(5, 6, 7, 8)
+
+    shapes = service.list_shapes()
+
+    assert isinstance(shape, Oval)
+    assert shape.id == 1
+    assert shape.summary() == "center=(5, 6), rx=7, ry=8"
+    assert shapes == [shape]
+
+
+def test_create_oval_invalid_radius_x(service):
+    with pytest.raises(ValidationError, match="Radius_x must be greater than zero."):
+        service.create_oval(0, 0, 0, 1)
+
+
+def test_create_oval_invalid_radius_y(service):
+    with pytest.raises(ValidationError, match="Radius_y must be greater than zero."):
+        service.create_oval(0, 0, 1, -1)
+
+
+def test_create_rectangle(service):
+    shape = service.create_rectangle(1, 2, 3, 4)
+
+    shapes = service.list_shapes()
+
+    assert isinstance(shape, Rectangle)
+    assert shape.id == 1
+    assert shape.summary() == "origin=(1, 2), width=3, height=4"
+    assert shapes == [shape]
+
+
+def test_create_rectangle_invalid_width(service):
+    with pytest.raises(ValidationError, match="Width must be greater than zero."):
+        service.create_rectangle(0, 0, 0, 5)
+
+
+def test_create_rectangle_invalid_height(service):
+    with pytest.raises(ValidationError, match="Height must be greater than zero."):
+        service.create_rectangle(0, 0, 5, -1)
+
+
 def test_delete_shape(service):
     shape = service.create_point(1, 2)
 
@@ -48,11 +98,3 @@ def test_delete_shape(service):
 def test_delete_missing_shape(service):
     with pytest.raises(ShapeNotFoundError, match="Shape with id=999 was not found."):
         service.delete_shape(999)
-
-
-def test_create_square(service):
-    shape = service.create_square(0, 0, 3)
-
-    assert isinstance(shape, Square)
-    assert shape.id == 1
-    assert shape.summary() == "origin=(0, 0), side=3"

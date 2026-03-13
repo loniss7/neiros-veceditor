@@ -4,7 +4,7 @@ import sqlite3
 from pathlib import Path
 
 from vector_editor.domain.base import Shape
-from vector_editor.domain.shapes import Circle, Point, Segment, Square
+from vector_editor.domain.shapes import Circle, Oval, Point, Rectangle, Segment, Square
 
 
 class SQLiteShapeRepository:
@@ -25,9 +25,10 @@ class SQLiteShapeRepository:
             self._connection.execute(
                 """
                 INSERT INTO shapes (
-                    id, type, x, y, x1, y1, x2, y2, center_x, center_y, radius, side
+                    id, type, x, y, x1, y1, x2, y2, center_x, center_y,
+                    radius, side, radius_x, radius_y, width, height
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 self._shape_to_row(shape),
             )
@@ -82,10 +83,50 @@ class SQLiteShapeRepository:
                     center_x REAL,
                     center_y REAL,
                     radius REAL,
-                    side REAL
+                    side REAL,
+                    radius_x REAL,
+                    radius_y REAL,
+                    width REAL,
+                    height REAL
                 )
                 """
             )
+
+        # Миграция для старых БД: добавляем отсутствующие колонки
+        required_columns = {
+            "x": "REAL",
+            "y": "REAL",
+            "x1": "REAL",
+            "y1": "REAL",
+            "x2": "REAL",
+            "y2": "REAL",
+            "center_x": "REAL",
+            "center_y": "REAL",
+            "radius": "REAL",
+            "side": "REAL",
+            "radius_x": "REAL",
+            "radius_y": "REAL",
+            "width": "REAL",
+            "height": "REAL",
+        }
+
+        existing_columns = {
+            row["name"]
+            for row in self._connection.execute("PRAGMA table_info(shapes)").fetchall()
+        }
+
+        missing_columns = [
+            (name, col_type)
+            for name, col_type in required_columns.items()
+            if name not in existing_columns
+        ]
+
+        if missing_columns:
+            with self._connection:
+                for name, col_type in missing_columns:
+                    self._connection.execute(
+                        f"ALTER TABLE shapes ADD COLUMN {name} {col_type}"
+                    )
 
     @staticmethod
     def _shape_to_row(shape: Shape) -> tuple:
@@ -95,6 +136,10 @@ class SQLiteShapeRepository:
                 "Point",
                 shape.x,
                 shape.y,
+                None,
+                None,
+                None,
+                None,
                 None,
                 None,
                 None,
@@ -118,6 +163,10 @@ class SQLiteShapeRepository:
                 None,
                 None,
                 None,
+                None,
+                None,
+                None,
+                None,
             )
         if isinstance(shape, Circle):
             return (
@@ -132,6 +181,10 @@ class SQLiteShapeRepository:
                 shape.center_x,
                 shape.center_y,
                 shape.radius,
+                None,
+                None,
+                None,
+                None,
                 None,
             )
         if isinstance(shape, Square):
@@ -148,6 +201,48 @@ class SQLiteShapeRepository:
                 None,
                 None,
                 shape.side,
+                None,
+                None,
+                None,
+                None,
+            )
+        if isinstance(shape, Oval):
+            return (
+                shape.id,
+                "Oval",
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                shape.center_x,
+                shape.center_y,
+                None,
+                None,
+                shape.radius_x,
+                shape.radius_y,
+                None,
+                None,
+            )
+        if isinstance(shape, Rectangle):
+            return (
+                shape.id,
+                "Rectangle",
+                shape.x,
+                shape.y,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                shape.width,
+                shape.height,
             )
         raise ValueError(f"Unsupported shape type: {type(shape).__name__}")
 
@@ -178,6 +273,22 @@ class SQLiteShapeRepository:
                 x=row["x"],
                 y=row["y"],
                 side=row["side"],
+            )
+        if shape_type == "Oval":
+            return Oval(
+                id=row["id"],
+                center_x=row["center_x"],
+                center_y=row["center_y"],
+                radius_x=row["radius_x"],
+                radius_y=row["radius_y"],
+            )
+        if shape_type == "Rectangle":
+            return Rectangle(
+                id=row["id"],
+                x=row["x"],
+                y=row["y"],
+                width=row["width"],
+                height=row["height"],
             )
 
         raise ValueError(f"Unknown shape type: {shape_type}")

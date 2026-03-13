@@ -10,6 +10,8 @@ class MenuAction(StrEnum):
     CREATE_SEGMENT = "Create segment"
     CREATE_CIRCLE = "Create circle"
     CREATE_SQUARE = "Create square"
+    CREATE_OVAL = "Create oval"
+    CREATE_RECTANGLE = "Create rectangle"
     LIST_SHAPES = "List shapes"
     DELETE_SHAPE = "Delete shape"
     HELP = "Help"

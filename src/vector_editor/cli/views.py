@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from collections.abc import Sequence
 
 from rich.console import Console
@@ -15,6 +16,7 @@ class RichCLIView:
 
     def clear(self) -> None:
         self.console.clear()
+        os.system("cls" if os.name == "nt" else "clear")
 
     def render_header(self) -> None:
         self.console.print(
@@ -28,7 +30,7 @@ class RichCLIView:
     def render_help(self) -> None:
         self.console.print(
             Panel(
-                "[bold]Supported shapes:[/bold] Point, Segment, Circle, Square\n"
+                "[bold]Supported shapes:[/bold] Point, Segment, Circle, Square, Oval, Rectangle\n"
                 "[bold]Operations:[/bold] Create, Delete, List, Help, Exit",
                 title="Help",
                 border_style="green",

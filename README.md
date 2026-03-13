@@ -18,3 +18,7 @@
 ## Support
 
 - Python 3.13
+
+## Update
+
+- Добавлены новые фигуры: `Oval`, `Rectangle`

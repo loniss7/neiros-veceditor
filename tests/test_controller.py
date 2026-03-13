@@ -23,6 +23,9 @@ class DummyMenu:
         self.available_ids = available_ids
         return self.shape_id
 
+    def pause(self):
+        return None
+
 
 class DummyView:
     def __init__(self):
@@ -111,6 +114,36 @@ def test_create_circle(service, monkeypatch):
 
     assert menu.float_labels == ["center x", "center y", "radius"]
     assert "Created Circle #1: center=(5, 6), radius=7" in view.success_messages[0]
+
+
+def test_create_oval(service, monkeypatch):
+    monkeypatch.setattr("builtins.input", lambda *args, **kwargs: "")
+    menu = DummyMenu(
+        [MenuAction.CREATE_OVAL, MenuAction.EXIT],
+        float_values=[5, 6, 7, 8],
+    )
+    view = DummyView()
+
+    controller = CLIController(service, view, menu)
+    controller.run()
+
+    assert menu.float_labels == ["center x", "center y", "radius x", "radius y"]
+    assert "Created Oval #1: center=(5, 6), rx=7, ry=8" in view.success_messages[0]
+
+
+def test_create_rectangle(service, monkeypatch):
+    monkeypatch.setattr("builtins.input", lambda *args, **kwargs: "")
+    menu = DummyMenu(
+        [MenuAction.CREATE_RECTANGLE, MenuAction.EXIT],
+        float_values=[1, 2, 3, 4],
+    )
+    view = DummyView()
+
+    controller = CLIController(service, view, menu)
+    controller.run()
+
+    assert menu.float_labels == ["origin x", "origin y", "width", "height"]
+    assert "Created Rectangle #1: origin=(1, 2), width=3, height=4" in view.success_messages[0]
 
 
 def test_delete_shape(service, monkeypatch):

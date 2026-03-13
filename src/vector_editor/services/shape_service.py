@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from vector_editor.domain.base import Shape
 from vector_editor.domain.errors import ShapeNotFoundError, ValidationError
-from vector_editor.domain.shapes import Circle, Point, Segment, Square
+from vector_editor.domain.shapes import Circle, Point, Segment, Square, Rectangle, Oval
 from vector_editor.repositories.base import ShapeRepository
 
 
@@ -32,6 +32,26 @@ class ShapeService:
     def create_square(self, x: float, y: float, side: float) -> Shape:
         self._ensure_positive(value=side, field_name="side")
         return self._repository.add(Square(id=self._repository.next_id(), x=x, y=y, side=side))
+
+    def create_oval(self, center_x: float, center_y: float, radius_x: float, radius_y: float) -> Shape:
+        self._ensure_positive(value=radius_x, field_name="radius_x")
+        self._ensure_positive(value=radius_y, field_name="radius_y")
+        return self._repository.add(
+            Oval(
+                id=self._repository.next_id(),
+                center_x=center_x,
+                center_y=center_y,
+                radius_x=radius_x,
+                radius_y=radius_y,
+            )
+        )
+
+    def create_rectangle(self, x: float, y: float, width: float, height: float) -> Shape:
+        self._ensure_positive(value=width, field_name="width")
+        self._ensure_positive(value=height, field_name="height")
+        return self._repository.add(
+            Rectangle(id=self._repository.next_id(), x=x, y=y, width=width, height=height)
+        )
 
     def list_shapes(self) -> list[Shape]:
         return list(self._repository.list_all())

@@ -59,3 +59,35 @@ class Square(Shape):
 
     def summary(self) -> str:
         return f"origin=({self.x:g}, {self.y:g}), side={self.side:g}"
+
+@dataclass(slots=True)
+class Oval(Shape):
+    center_x: float
+    center_y: float
+    radius_x: float
+    radius_y: float
+
+    @property
+    def shape_type(self) -> str:
+        return "Oval"
+
+    def summary(self) -> str:
+        return (
+            f"center=({self.center_x:g}, {self.center_y:g}), "
+            f"rx={self.radius_x:g}, ry={self.radius_y:g}"
+        )
+
+
+@dataclass(slots=True)
+class Rectangle(Shape):
+    x: float
+    y: float
+    width: float
+    height: float
+
+    @property
+    def shape_type(self) -> str:
+        return "Rectangle"
+
+    def summary(self) -> str:
+        return f"origin=({self.x:g}, {self.y:g}), width={self.width:g}, height={self.height:g}"

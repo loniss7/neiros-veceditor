@@ -25,6 +25,34 @@ def test_choose_action(monkeypatch):
     assert action == MenuAction.CREATE_POINT
 
 
+def test_choose_action_oval(monkeypatch):
+    monkeypatch.setattr(
+        questionary,
+        "select",
+        lambda *args, **kwargs: DummyPrompt("Create oval"),
+    )
+
+    menu = QuestionaryMenu()
+
+    action = menu.choose_action()
+
+    assert action == MenuAction.CREATE_OVAL
+
+
+def test_choose_action_rectangle(monkeypatch):
+    monkeypatch.setattr(
+        questionary,
+        "select",
+        lambda *args, **kwargs: DummyPrompt("Create rectangle"),
+    )
+
+    menu = QuestionaryMenu()
+
+    action = menu.choose_action()
+
+    assert action == MenuAction.CREATE_RECTANGLE
+
+
 def test_choose_action_returns_exit_on_none(monkeypatch):
     monkeypatch.setattr(
         questionary,
